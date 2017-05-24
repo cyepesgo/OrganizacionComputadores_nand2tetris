@@ -1,0 +1,61 @@
+class MisilEnemigo {
+	
+	field int x, y, tam;
+
+
+//Constructor de la clase MisilEnemigo	
+	constructor MisilEnemigo new (int xInicial) {
+		let x = xInicial;
+		let y = 50;
+		let tam = 4;
+		
+		return this;
+	}
+	
+//Metodo dibujar    
+    method void dibujar(int isTrue) {
+		if (isTrue = 1) {
+		    do Screen.setColor(true);
+		}
+		else {
+			do Screen.setColor(false);
+		}
+		
+		if ((x > 0) & (y > 0) & ((x+tam) < 510) & ((y+tam) < 253)) {
+			do Screen.drawRectangle(x, y, x + tam, y + tam);
+		}
+   return;
+  }
+	
+//Metodo Eliminar    
+	method void eliminar() {
+		do Screen.setColor(false);
+	    do Screen.drawRectangle(x, y, x + tam, y + tam);
+	    let x = 500;
+	    let y = 245;
+	    do Screen.setColor(true);
+        return;
+	}
+	
+	
+//Metodo getCoordenadaX    
+    method int getCoordenadaX() {
+		return x;
+	}
+    
+    
+
+//Metodo getCoordenadaY
+	method int getCoordenadaY() {
+		return y;
+	}
+	
+
+//Metodo disparar	
+	 method void disparar() {
+			do dibujar(0);
+      let y = y + 2;
+			do dibujar(1);
+      return;
+    }
+}

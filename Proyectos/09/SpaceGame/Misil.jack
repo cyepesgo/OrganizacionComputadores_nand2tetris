@@ -1,0 +1,62 @@
+class Misil {
+	
+	field int x, y;
+	field int tam;
+    
+//Constructor de la clase Misil
+	constructor Misil new (int xInicial) {
+		let x = xInicial;
+		let y = 229;
+		let tam = 2;
+
+		do dibujar();
+		return this;
+	}
+	
+//Metodo dibujar
+ //Dibuja el Misil en la pantalla 
+    method void dibujar() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + tam, y + tam);
+        return;
+    }
+    
+//Metodo eliminar    
+    //desasigna la memoria del objeto 
+    
+    method void eliminar() {
+		do Screen.setColor(false);
+       do Screen.drawRectangle(x, y, x + tam, y + tam);
+	   do Memory.deAlloc(this);
+        return;
+    }
+
+//Metodo disparar
+    method void disparar() {
+        if (y > 10) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + tam, y + tam);
+            let y = y - 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + tam, y + tam);
+        }
+		else {
+			do eliminar();
+		}
+        return;
+    }
+    
+    
+ //Metodo getCoordenadaX  
+	method int getCoordenadaX() {
+		return x;
+	}
+
+
+//Metodo getCoordenadaY
+	method int getCoordenadaY() {
+		return y;
+	}
+	
+
+}

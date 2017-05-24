@@ -1,0 +1,103 @@
+class Enemigo {
+
+    field int x, y, tam, estaMuerto;
+    
+    //Mi enemigo solo se mueve hacia la derecha y hacia la izquierda.  1 - derecha, 2 - izquierda
+    field int direccion; 
+	
+//Constructor de la clase Enemigo	
+	constructor Enemigo new(int xInicial, int yInicial, int tamInicial) {
+		let tam = tamInicial;
+		let x = xInicial;
+		let y = yInicial;
+		let direccion = 1;
+		let estaMuerto = 0;
+		do dibujar();
+		return this;
+	}
+	
+
+//Metodo Dibujar
+	method void dibujar() {
+		do Screen.setColor(true);
+		do Screen.drawRectangle(x, y, x+tam, y+tam);
+		return;
+	}
+    
+    
+//Metodo eliminar	
+	method void eliminar() {
+		let estaMuerto = 1;
+		do Screen.setColor(false);
+	    do Screen.drawRectangle(x, y, x + tam, y + tam);
+	    let x = 500;
+	    let y = 245;
+	    do Screen.setColor(true);
+        return;
+	}
+    
+    
+//Metodo getCoordenadaX
+	method int getCoordenadaX() {
+		return x;
+	}
+    
+//Metodo getCoordenadaY    
+	method int getCoordenadaY() {
+		return y;
+	}
+	
+//Metodo getEstaMuerto    
+	method int getEstaMuerto() {
+		return estaMuerto;
+	}
+    
+    
+//Metodo getDireccion	
+	method int getDireccion() {
+		return direccion;
+	}
+	
+//Metodo cambiarDireccion    
+    //Metodo que permite a las naves enemigas cambiar de direccion
+	method void cambiarDireccion() {
+		if (direccion = 1) {
+			let direccion = 2;
+		}
+		else {
+			let direccion = 1;
+		}
+		return;
+	}
+    
+    
+//Metodo moverALaDerecha	
+    //Metodo para mover enemigo hacia la derecha 
+	method void moverALaDerecha() {
+		if (estaMuerto = 0) {
+			do Screen.setColor(false);
+			do Screen.drawRectangle(x, y, x + tam, y + tam);
+			let x = x + 10;
+			do Screen.setColor(true);
+			do Screen.drawRectangle(x, y, x+tam, y+tam);
+		}
+		return;
+	}
+
+	
+
+//Metodo moverALaIzquierda	
+    //Metodo para mover enemigo hacia la izquierda
+	method void moverALaIzquierda() {
+		if (estaMuerto = 0) {
+			do Screen.setColor(false);
+		    do Screen.drawRectangle(x, y, x + tam, y + tam);
+			let x = x - 10;
+			do Screen.setColor(true);
+			do Screen.drawRectangle(x, y, x+tam, y+tam);
+		
+		}
+		return;
+	}
+
+}

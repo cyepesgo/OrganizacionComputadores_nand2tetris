@@ -1,0 +1,93 @@
+class Nave {
+
+    // variables con las que se va a localizar mi nave en la pantalla
+    field int x, y;
+
+    // El tamaño de mi nave
+    field int tam;
+	field int ancho;
+
+    field Misil misil;
+    
+//Constructor de la clase Nave
+    //Construye mi nave en la direccion y con las medidas dadas 
+    constructor Nave new() {
+        let x = 0;
+        let y = 230;
+        let tam = 5;
+		let ancho = 40;
+
+        do dibujar();
+
+        return this;
+    }
+
+//Metodo dibujar
+    //Metodo que dibuja mi nave en la pantalla.
+    method void dibujar() {
+        do Screen.setColor(true);
+		 do Screen.drawRectangle(x, y, x + tam + ancho, y + tam);
+        return;
+    }
+	
+//Metodo eliminar	
+    //Desasigna la memoria del objeto
+    method void eliminar() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+
+  
+//Metodo moverALaIzquierda
+    //Metodo para mover la nave a la izquierda. La nave se mueve 2 pixeles 
+    method void moverALaIzquierda() {
+        if (x > 1) {
+            do Screen.setColor(false);
+			do Screen.drawRectangle(x, y, x + tam + ancho, y + tam);
+            let x = x - 2;
+            do Screen.setColor(true);
+			do Screen.drawRectangle(x, y, x + tam + ancho, y + tam);
+        }
+		do Sys.wait(4);
+        return;
+    }
+    
+//Metodo moverALaDerecha
+    //Metodo para mover la nave a la izquierda. La nave se mueve 2 pixeles. 
+    method void moverALaDerecha() {
+        if ((x + tam) < 470) {
+            do Screen.setColor(false);
+		   do Screen.drawRectangle(x, y, x + tam + ancho, y + tam);
+            let x = x + 2;
+            do Screen.setColor(true);
+			do Screen.drawRectangle(x, y, x + tam + ancho, y + tam);
+        }
+		do Sys.wait(4);
+        return;
+    }
+    
+//Metodo dispararMisil    
+    //Metodo para que mi nave dispare a los enemigos
+    method void dispararMisil() {
+		var int temp;
+		let temp = (tam + ancho)/2;
+        let misil = Misil.new(x + temp);
+        return;
+    }
+
+//Metodo getCoordenadaX
+    method int getCoordenadaX() {
+		return x;
+	}
+//Metodo getCoordenadaY	
+	method int getCoordenadaY() {
+		return y;
+	}
+    
+//Metodo getMisil    
+    method Misil getMisil() {
+        return misil;
+    }
+    
+}

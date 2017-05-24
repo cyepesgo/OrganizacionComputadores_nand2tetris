@@ -1,0 +1,543 @@
+class Juego {
+
+//Declaracion de Variables
+
+  // Mi Nave Espacial
+   field Nave naveEspacial;
+	
+  // Las direcciones en las que se puede mover mi nave espacial
+    field int direccion; // 0=no se mueve,1=hacia arriba,2=hacia abajo,3= hacia la izquierda,4= hacia la derecha
+
+    field int esMisil;
+	field Array enemigos;
+	field int enemigosEliminados;
+	field int numEnemigos;
+	field int tiempo;
+	field int puntaje;
+	field MisilEnemigo misilEn;
+	field int esMisilEn;
+	field int vidas; // numero de vidas 
+	field int enTam; //tamaño del Enemigo
+	field int tn; // tamaño de la Nave
+	field int tnx, tny;
+	field int meDio; // 0 = no me dio, 1 = me dio
+	
+	
+	
+//Constructor de la Clase Juego-Inicializo un Juego Nuevo. 
+constructor Juego new() {
+    let naveEspacial = Nave.new();
+    let direccion = 0;
+    let esMisil = 0;
+    let enemigosEliminados = 0;		
+    let numEnemigos = 10;
+    let enemigos = Array.new(numEnemigos);		
+    let puntaje = 0;
+    let tiempo = 0;
+    let esMisilEn = 0;
+    let enTam = 10;
+    let tn = 10;
+    let tnx = 50;
+    let tny = 10;
+
+		
+		do crearEnemigos();
+		let vidas = 5;
+        return this;
+  }
+	
+    
+//Metodo crearEnemigos    
+//Creo los enemigos del juego
+method void crearEnemigos() {
+	var int x, y, cont;
+	var Enemigo en;
+	let x = 15;
+	let y = 50;
+	let cont = 0;
+		
+	while (cont < numEnemigos) {
+		let en = Enemigo.new(x, y, enTam);
+		let enemigos[cont] = en;
+			
+		let x = x + 20;
+		let cont = cont+1;
+	}
+		return;
+}
+
+
+//Metodo misilPegoEnemigo
+//Metodo que comprueba si un misil le pego a un enemigo
+	
+method int misilPegoEnemigo(Enemigo en, Misil m) {
+	var int eny, enx;
+	var int my, mx;
+	let my = m.getCoordenadaY();
+	let eny = en.getCoordenadaY();
+	let mx = m.getCoordenadaX();
+	let enx = en.getCoordenadaX();
+	
+	if ( (~(my < eny)) & (~(my > (eny+enTam))) ) {
+		if ((~(mx < enx)) & (~(mx > (enx+enTam)))) {
+			return 1;
+		}
+	}			
+	return 0;
+}
+	
+    
+//Metodo enemigoEliminado    
+//Metodo que hace los cambios en el programa si le pegue a un enemigo
+method int enemigoEliminado(Misil m) {
+	var int cont, i;
+	var Enemigo en;
+	let cont = 0;
+	while (cont < numEnemigos) {
+		let en = enemigos[cont];
+		let i = misilPegoEnemigo(en, m);
+		if (i = 1) {		
+			do en.eliminar();
+			
+			let enemigosEliminados = enemigosEliminados + 1;
+			let puntaje = puntaje + 1;
+			do Output.moveCursor(0,0);
+			do Output.printString("PUNTAJE: ");
+			do Output.printInt(puntaje);
+			do Output.printString("      VIDAS: ");
+			do Output.printInt(vidas);
+			if (enemigosEliminados = numEnemigos) {
+				do Memory.deAlloc(enemigos);
+				let enemigos = Array.new(numEnemigos);
+				do crearEnemigos();
+				let enemigosEliminados = 0;
+			}
+				return 1;
+			}
+			let cont = cont+1;
+		}
+	return 0;
+}
+
+
+
+
+//Metodo moverEnemigos
+//Metodo que mueve los enemigos
+method void moverEnemigos() {
+	var int cont;
+	var Enemigo enD, enI, temp_en, en;
+	var int endx;
+	var int enix;
+	var int eny;
+	var int dir;
+	var int eliminado, encontrado;
+	var int aLaIzquierda, aLaDerecha, alFinal;
+	
+	
+	let cont = 0; let encontrado = 0;
+	while ((cont < numEnemigos) & ~encontrado) {
+		let temp_en = enemigos[cont];
+		let eliminado = temp_en.getEstaMuerto();
+		if (eliminado = 0) {
+			let enI = temp_en;
+			let encontrado = 1;
+		}
+		let cont = cont + 1;
+	}
+		
+	
+	let cont = 9; let encontrado = 0;
+	while ((cont > -1) & ~encontrado) {
+		let temp_en = enemigos[cont];
+		let eliminado = temp_en.getEstaMuerto();
+		if (eliminado = 0) {
+			let enD = temp_en;
+			let encontrado = 1;
+		}
+		let cont = cont - 1;
+	}
+	
+	let endx = enD.getCoordenadaX();
+	let enix= enI.getCoordenadaX();
+	let eny = enI.getCoordenadaY();
+	let dir = enI.getDireccion();
+	
+	let aLaIzquierda = 0; let aLaDerecha = 0; let alFinal = 1; 
+	if (enix < 20) {
+		let aLaIzquierda = 1;
+	}
+	if (endx > 490) {
+		let aLaDerecha = 1;
+	}
+	if (eny > 200) {
+		let alFinal = 1;
+	}
+
+		
+
+		
+	if (dir = 1) { // Ir a la derecha
+		if (aLaDerecha = 0) {
+			// sigue moviendose  a la derecha
+			let cont = 0;
+			while (cont < numEnemigos) {
+				let en = enemigos[cont];
+				do en.moverALaDerecha();
+				let cont = cont + 1;
+			}
+		}
+		else {
+			if (alFinal = 1) { // Esta en el borde de la derecha
+				// moverse a la izquierda
+				let cont = 0;
+				while (cont < numEnemigos) {
+					let en = enemigos[cont];
+					do en.moverALaIzquierda();
+					do en.cambiarDireccion();
+					let cont = cont + 1;
+				}
+			}
+		}
+	}
+	if (dir = 2) { // ir a la izquierda
+		if (aLaIzquierda = 0) {
+			// sigue moviendose a la izquierda
+			let cont = 0;
+			while (cont < numEnemigos) {
+				let en = enemigos[cont];
+				do en.moverALaIzquierda();
+				let cont = cont + 1;
+			}
+		}
+		else {
+			if (alFinal = 1) {//Esta en el borde de la izquierda
+				// moverse a la derecha
+				let cont = 0;
+				while (cont < numEnemigos) {
+					let en = enemigos[cont];
+					do en.moverALaDerecha();
+					do en.cambiarDireccion();
+					let cont = cont + 1;
+				}
+			}
+		}
+	}
+	do Sys.wait(5);
+	return;
+}
+	
+   
+ 
+
+//Metodo gestionarTiempo
+	method int gestionarTiempo(int t, int a) {
+		var int temporizador;
+		let temporizador = t;
+		if (t > 300) {
+		  let tiempo = 0;
+		}
+		if (t < a) {
+			return t;
+		}
+		while (temporizador > (a-1)) {
+			let temporizador = temporizador - a;
+		}
+		return temporizador;
+	
+	}
+    
+
+
+//Metodo Jugar
+    
+    //Metodo que empieza el juego, maneja las acciones del usuario
+    method void jugar() {
+        var char tecla;
+        var boolean salir;
+        var Misil m;
+		var int leDi1, leDi2;
+		var int regTiempo;
+		let leDi1 = 0;
+		let leDi2 = 0;
+        let salir = false;
+
+		do Output.moveCursor(0,0);
+		do Output.printString("PUNTAJE: ");
+		do Output.printInt(puntaje);
+		do Output.printString("      VIDAS: ");
+		do Output.printInt(vidas);
+
+        while (~salir) {
+			let tiempo = tiempo + 1;
+            //Espera por que el jugador presione una tecla
+            while (tecla = 0) {
+                if (tiempo = 299) {
+					do seleccionarEnemigo();
+				}
+				do moverMisil();
+				
+				let tiempo = tiempo + 1;	
+				let tecla = Keyboard.keyPressed();
+                do moverNave();
+				let regTiempo = gestionarTiempo(tiempo, 60);
+				if (regTiempo = 0) {
+					do moverEnemigos();
+				}
+				 if (esMisil = 1) {
+                    let m = naveEspacial.getMisil();
+                    do m.disparar();
+					do buscarMisil(m);
+					let leDi1 = enemigoEliminado(m);
+					if (leDi1 = 1) {
+						do m.eliminar();
+						let esMisil = 0;
+					}
+                }
+				if (vidas = 0) {
+					let tecla = 1;
+				}
+            }
+			if (tecla = 1) {
+					do Screen.clearScreen();
+					do Output.moveCursor(0, 0);
+					do Output.printString("Has Muerto! Deseas Reiniciar el Juego?");
+					do Output.moveCursor(10, 0);
+					do Output.printString("Eliminaste ");
+					do Output.printInt(puntaje);
+					do Output.printString(" enemigos ");
+					do Output.moveCursor(20, 0);
+					do Output.printString("Para Reiniciar El Juego Oprime Y, de lo contrario oprime N");
+					let tecla = Keyboard.keyPressed();
+					while(tecla = 0) {
+						let tecla = Keyboard.keyPressed();
+					}
+				
+				//Preguntar si quiere Reiniciar el Juego
+				
+				if (tecla = 89) {// 89 la tecla Y
+					do Screen.clearScreen();
+					do crearEnemigos();
+					let salir = false;
+					let vidas = 5;
+					let puntaje = 0;
+					do Output.moveCursor(0,0);
+					do Output.printString("PUNTAJE: ");
+					do Output.printInt(puntaje);
+					do Output.printString("      VIDAS: ");
+					do Output.printInt(vidas);
+				}
+				else {
+					let salir = true;
+					let tecla = 78;
+					
+				}
+			}
+			
+            if (tecla = 78) {
+                let salir = true;
+            }
+            if (tecla = 130) {//Permite moverse a la izquierda cuando oprimo la tecla
+				let tiempo = tiempo + 1;	
+				if (tiempo = 299) {
+					do seleccionarEnemigo();
+				}
+				do moverMisil();
+			    let direccion = 3;
+            }
+            if (tecla = 132) {//Permite moverse a la derecha cuando oprimo la tecla
+				let tiempo = tiempo + 1;	
+                if (tiempo = 299) {
+					do seleccionarEnemigo();
+				}
+				do moverMisil();
+				let direccion = 4;
+            }
+            if (tecla = 32) { //barra espaciadora = 32 para disparar
+				let tiempo = tiempo + 1;	
+				if (tiempo = 299) {
+					do seleccionarEnemigo();
+				}
+				do moverMisil();
+				if (esMisil = 0) {
+					let tiempo = tiempo + 1;	
+					do naveEspacial.dispararMisil();
+					let esMisil = 1;
+				}
+			}
+	
+            // Espera que el usuario suelte la tecla
+            while (~(tecla = 0)) {
+				if (tiempo = 299) {
+					do seleccionarEnemigo();
+				}
+				do moverMisil();
+				
+				let tiempo = tiempo + 1;	
+			    let tecla = Keyboard.keyPressed();
+                do moverNave(); 
+				let regTiempo = gestionarTiempo(tiempo, 15);				
+				if (regTiempo = 0) {
+					do moverEnemigos();
+				}
+				let tecla = 0;
+                let direccion = 0;
+
+                if (esMisil = 1) {
+                    let m = naveEspacial.getMisil();
+                    do m.disparar();
+					do buscarMisil(m);
+					let leDi2 = enemigoEliminado(m);
+					if (leDi2 = 1) {
+						
+						do m.eliminar();
+						let esMisil = 0;
+					}
+					
+                }
+				
+            }
+		
+        }
+            
+        return;
+    }
+    
+
+
+//Metodo moverNave
+    // Mueve mi nave espacial en la direccion dada. 2 pixeles. 
+    method void moverNave() {
+        if (direccion = 3) {
+            do naveEspacial.moverALaIzquierda();
+        }
+        if (direccion = 4) {
+            do naveEspacial.moverALaDerecha();
+        }
+       
+        return;
+    }
+	
+    
+//Metodo buscarMisil    
+    //Misil de la nave
+	method void buscarMisil(Misil m) {
+		if (m.getCoordenadaY() < 11) {
+			let esMisil = 0;
+			do m.eliminar();
+		}
+		return;
+	}
+	
+	
+ 
+//Metodo crearMisil 
+	method void crearMisil(Enemigo en) {
+		var int enx;
+		let enx = en.getCoordenadaX();
+		let misilEn = MisilEnemigo.new(enx);
+		let esMisilEn = 1;
+		return;
+	}
+    
+    
+//Metodo seleccionarEnemigo    
+	
+	//Selecciona Enemigo que va a disparar. Obtiene el valor de x del misil 
+    //El metodo busca un enemigo que no este muerto
+	method void seleccionarEnemigo() {
+		var int count;
+		var Enemigo en;
+		var int enx, eliminado;
+		
+		if (esMisilEn = 0) {
+			let count = 0;
+			while (count < numEnemigos) {
+				
+				let en = enemigos[count];
+				let eliminado = en.getEstaMuerto();
+				if (eliminado = 0) { 
+					do crearMisil(en);
+				}
+				let count = count + 1;
+			}
+		}
+		
+		return;
+	}
+	
+	
+
+//Metodo moverMisil
+    method void moverMisil() {
+		var int my;
+		var int tecla;
+		if (esMisilEn = 1) {
+			do misilEn.disparar();
+			let meDio = misilMePego();
+			let my = misilEn.getCoordenadaY();
+			if (my > 249) {
+				do destruirMisil();
+			}			
+		}
+		do Sys.wait(3);
+		return;
+	}
+	
+
+
+//Metodo destruirMisil
+	
+	//Borra el misil enemigo de la pantalla
+	method void destruirMisil() {
+		if (esMisilEn = 1) {
+			do misilEn.eliminar();
+			let esMisilEn = 0;
+		}
+		return;
+	}
+    
+    
+//Metodo misilMePego    
+	
+    /**Metodo para saber si el enemigo me pego. Compara las coordenadas X y Y de la nave con las coordenadas X y Y del Misil Enemigo.*/
+    
+	method int misilMePego() {
+		
+		var int sy, sx;
+		var int by, bx;
+		var int bs;
+		let by = misilEn.getCoordenadaY();
+		let sy = naveEspacial.getCoordenadaY();
+		let bx = misilEn.getCoordenadaX();
+		let sx = naveEspacial.getCoordenadaX();
+		let bs = 4;
+		
+		
+		if (esMisilEn = 1) {
+			
+		
+			if ( ((bx > sx) & (by > sy) & (bx < (sx+ tnx)) & (by < (sy+tny)))				|
+				(((bx+bs) > sx) & (by > sy) & ((bx+bs) < (sx + tnx)) & (by < (sy+tny))) 	|
+				((bx > sx) & ((by+bs) > sy) & (bx < (sx+tnx)) & ((by+bs) < (sy+tny)))		|
+				(((bx+bs) > sx) & ((by+bs) > sy) & ((bx+bs) < (sx+tnx)) & ((by+bs) < (sy+tny))) ) {
+				
+				do destruirMisil();
+				let vidas = vidas -1;
+				do Output.moveCursor(0,0);
+				do Output.printString("PUNTAJE: ");
+				do Output.printInt(puntaje);
+				do Output.printString("      VIDAS: ");
+				do Output.printInt(vidas);
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+	
+
+
+
+
+}
